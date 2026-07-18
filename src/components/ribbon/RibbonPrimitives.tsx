@@ -1,7 +1,135 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+} from "react";
+import { createPortal } from "react-dom";
 import { IconChevronDown, IconGroupLauncher, IconAlignLeft, IconAlignCenter, IconAlignRight, IconAlignJustify } from "./RibbonIcons";
+
+type FloatingAlign = "left" | "right";
+
+function useRibbonFloatingMenu(
+  open: boolean,
+  anchorRef: RefObject<HTMLElement | null>,
+  onClose: () => void,
+  options?: {
+    maxHeight?: number;
+    align?: FloatingAlign;
+    containerRef?: RefObject<HTMLElement | null>;
+  },
+) {
+  const menuRef = useRef<HTMLElement | null>(null);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
+  const maxHeight = options?.maxHeight ?? 320;
+  const align = options?.align ?? "left";
+  const containerRef = options?.containerRef ?? anchorRef;
+
+  const updatePosition = useCallback(() => {
+    const anchor = anchorRef.current;
+    if (!anchor) return;
+
+    const rect = anchor.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    const openUpward = spaceBelow < Math.min(maxHeight, 200) && spaceAbove > spaceBelow;
+
+    const style: CSSProperties = {
+      position: "fixed",
+      zIndex: 10000,
+      maxHeight,
+      overflowY: "auto",
+      ...(openUpward
+        ? { bottom: window.innerHeight - rect.top + 2 }
+        : { top: rect.bottom + 2 }),
+    };
+
+    if (align === "right") {
+      style.right = window.innerWidth - rect.right;
+    } else {
+      style.left = rect.left;
+      style.minWidth = rect.width;
+    }
+
+    setMenuStyle(style);
+  }, [anchorRef, maxHeight, align]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    updatePosition();
+    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", updatePosition);
+
+    return () => {
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", updatePosition);
+    };
+  }, [open, updatePosition]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target as Node;
+      if (containerRef.current?.contains(target)) return;
+      if (menuRef.current?.contains(target)) return;
+      onClose();
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open, onClose, containerRef]);
+
+  return { menuRef, menuStyle };
+}
+
+function RibbonFloatingMenu({
+  open,
+  anchorRef,
+  containerRef,
+  onClose,
+  children,
+  className = "",
+  role,
+  align = "left",
+  maxHeight = 320,
+}: {
+  open: boolean;
+  anchorRef: RefObject<HTMLElement | null>;
+  containerRef?: RefObject<HTMLElement | null>;
+  onClose: () => void;
+  children: ReactNode;
+  className?: string;
+  role?: string;
+  align?: FloatingAlign;
+  maxHeight?: number;
+}) {
+  const { menuRef, menuStyle } = useRibbonFloatingMenu(open, anchorRef, onClose, {
+    maxHeight,
+    align,
+    containerRef,
+  });
+
+  if (!open || typeof document === "undefined") return null;
+
+  return createPortal(
+    <div
+      ref={menuRef}
+      className={`ribbon-menu ribbon-menu-portal ${align === "right" ? "ribbon-menu-right" : ""} ${className}`.trim()}
+      role={role}
+      style={menuStyle}
+    >
+      {children}
+    </div>,
+    document.body,
+  );
+}
 
 export function RibbonDivider() {
   return <div className="ribbon-divider" aria-hidden />;
@@ -82,21 +210,10 @@ export function RibbonSplitButton({
   children: ReactNode;
   menu?: ReactNode;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!dropdownOpen) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        onClose?.();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [dropdownOpen, onClose]);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div ref={ref} className="ribbon-split">
+    <div ref={wrapRef} className="ribbon-split">
       <button
         type="button"
         title={title}
@@ -117,7 +234,13 @@ export function RibbonSplitButton({
       >
         <IconChevronDown size={7} />
       </button>
-      {dropdownOpen && menu ? <div className="ribbon-menu">{menu}</div> : null}
+      <RibbonFloatingMenu
+        open={Boolean(dropdownOpen && menu)}
+        anchorRef={wrapRef}
+        onClose={() => onClose?.()}
+      >
+        {menu}
+      </RibbonFloatingMenu>
     </div>
   );
 }
@@ -138,27 +261,50 @@ export function RibbonSelect({
   className?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open]);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const { menuStyle, menuRef } = useRibbonFloatingMenu(open, triggerRef, () => setOpen(false), {
+    maxHeight: 240,
+    containerRef: wrapRef,
+  });
 
   const selectedLabel =
     displayValue ??
     options.find((opt) => opt.value === value)?.label ??
     value;
 
+  const menu = open ? (
+    <ul
+      ref={menuRef}
+      className="ribbon-select-menu ribbon-select-menu-portal"
+      role="listbox"
+      aria-label={label}
+      style={menuStyle}
+    >
+      {options.map((opt) => (
+        <li key={opt.value} role="none">
+          <button
+            type="button"
+            role="option"
+            aria-selected={opt.value === value}
+            className={`ribbon-select-option ${opt.value === value ? "ribbon-select-option-active" : ""}`}
+            style={{ fontFamily: opt.value }}
+            onClick={() => {
+              onChange(opt.value);
+              setOpen(false);
+            }}
+          >
+            {opt.label}
+          </button>
+        </li>
+      ))}
+    </ul>
+  ) : null;
+
   return (
-    <div ref={ref} className={`ribbon-select-wrap ${className}`}>
+    <div ref={wrapRef} className={`ribbon-select-wrap ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
         aria-label={label}
         aria-haspopup="listbox"
@@ -169,27 +315,7 @@ export function RibbonSelect({
         <span className="ribbon-select-display">{selectedLabel}</span>
         <IconChevronDown size={7} className="ribbon-select-chevron" />
       </button>
-      {open ? (
-        <ul className="ribbon-select-menu" role="listbox" aria-label={label}>
-          {options.map((opt) => (
-            <li key={opt.value} role="none">
-              <button
-                type="button"
-                role="option"
-                aria-selected={opt.value === value}
-                className={`ribbon-select-option ${opt.value === value ? "ribbon-select-option-active" : ""}`}
-                style={{ fontFamily: opt.value }}
-                onClick={() => {
-                  onChange(opt.value);
-                  setOpen(false);
-                }}
-              >
-                {opt.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : null}
+      {typeof document !== "undefined" && menu ? createPortal(menu, document.body) : null}
     </div>
   );
 }
@@ -197,39 +323,29 @@ export function RibbonSelect({
 export function RibbonMenuPanel({
   open,
   onClose,
+  anchorRef,
   children,
   className = "",
   align = "left",
 }: {
   open: boolean;
   onClose: () => void;
+  anchorRef: RefObject<HTMLElement | null>;
   children: ReactNode;
   className?: string;
   align?: "left" | "right";
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        onClose();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open, onClose]);
-
-  if (!open) return null;
-
   return (
-    <div
-      ref={ref}
-      className={`ribbon-menu ribbon-menu-panel ${align === "right" ? "ribbon-menu-right" : ""} ${className}`}
+    <RibbonFloatingMenu
+      open={open}
+      anchorRef={anchorRef}
+      onClose={onClose}
+      className={`ribbon-menu-panel ${className}`.trim()}
       role="menu"
+      align={align}
     >
       {children}
-    </div>
+    </RibbonFloatingMenu>
   );
 }
 
@@ -275,22 +391,13 @@ export function RibbonDropdownButton({
   menu: ReactNode;
   className?: string;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    function handleClickOutside(event: MouseEvent) {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        onToggle();
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [open, onToggle]);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <div ref={ref} className={`ribbon-dropdown ${className}`}>
+    <div ref={wrapRef} className={`ribbon-dropdown ${className}`}>
       <button
+        ref={triggerRef}
         type="button"
         title={title}
         aria-label={title}
@@ -301,7 +408,15 @@ export function RibbonDropdownButton({
         {children}
         <IconChevronDown size={7} />
       </button>
-      {open ? <div className="ribbon-menu">{menu}</div> : null}
+      <RibbonFloatingMenu
+        open={open}
+        anchorRef={triggerRef}
+        containerRef={wrapRef}
+        onClose={onToggle}
+        role="menu"
+      >
+        {menu}
+      </RibbonFloatingMenu>
     </div>
   );
 }

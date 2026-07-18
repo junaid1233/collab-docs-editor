@@ -528,6 +528,12 @@ body {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
 }
 
+.ribbon-select-menu-portal {
+  position: fixed;
+  top: auto;
+  left: auto;
+}
+
 .ribbon-select-option {
   display: block;
   width: 100%;
@@ -598,6 +604,17 @@ body {
 .ribbon-menu-right {
   left: auto;
   right: 0;
+}
+
+.ribbon-menu-portal {
+  position: fixed;
+  top: auto;
+  left: auto;
+  right: auto;
+}
+
+.ribbon-menu-portal.ribbon-menu-right {
+  left: auto;
 }
 
 .ribbon-menu-item {
