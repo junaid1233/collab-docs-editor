@@ -1,3 +1,6 @@
-Paste your Loom or YouTube walkthrough URL here after recording.
+# Paste your Loom or YouTube walkthrough URL below (one line only).
+# Record using WALKTHROUGH_SCRIPT.md, then replace this comment with the URL.
+#
+# Example: https://www.loom.com/share/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
 
-Example: https://youtu.be/your-video-id
+PENDING — record walkthrough after Vercel deploy

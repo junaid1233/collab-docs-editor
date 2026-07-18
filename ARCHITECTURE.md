@@ -1,8 +1,12 @@
-# Architecture Note — Ajaia Docs
+# Architecture Note — Raxha
+
+*Ajaia LLC assessment submission — lightweight collaborative document editor.*
 
 ## Overview
 
-Ajaia Docs is a monolithic Next.js application using the App Router for both UI and API routes. This keeps deployment simple (single Vercel project) while still demonstrating full stack capability: auth, persistence, sharing logic, file handling, and a rich-text editor.
+Raxha is a monolithic Next.js application using the App Router for both UI and API routes. This keeps deployment simple (single Vercel project) while still demonstrating full stack capability: auth, persistence, sharing logic, file handling, and a rich-text editor.
+
+**Collaboration model:** Asynchronous sharing by email (owner + shared user edit access). Real-time simultaneous editing was intentionally excluded — see Tradeoffs.
 
 ## Prioritization
 

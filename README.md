@@ -1,18 +1,26 @@
-# Ajaia Docs
+# Raxha — Lightweight Collaborative Document Editor
 
-A lightweight collaborative document editor built for the Ajaia LLC AI-Native Full Stack Developer assessment.
+*Submission for the Ajaia LLC AI-Native Full Stack Developer assessment.*
+
+A lightweight document editor inspired by Google Docs — focused on create, edit, persist, import, and share. Built with Next.js, TipTap, and Prisma. **Collaboration is asynchronous via email sharing**, not live multi-cursor co-editing.
 
 ## Live Demo
 
-**Production URL:** _Deploy to Vercel + Turso and paste URL here_
+**Production URL:** `https://YOUR-APP.vercel.app` _(replace after deploy — see [Deployment](#deployment-vercel--turso))_
+
+Local: [http://localhost:3000](http://localhost:3000)
+
+## Product Judgment
+
+This submission prioritizes a **complete document lifecycle**—create, edit, persist, import, and share—over real-time simultaneous editing. Users collaborate **asynchronously**: owners share documents by email, and registered users with shared access can read and edit. Real-time multi-cursor collaboration (WebSockets/Yjs) was **intentionally scoped out** to ship a reliable, demo-ready product within the assessment timebox. API-level access control (owner vs shared vs denied) protects every document operation.
 
 ## Features
 
 - Email/password login with seeded demo users
 - Create, rename, edit, save, and reopen documents
-- Rich text editing (bold, italic, underline, H1/H2, bullet/numbered lists)
+- Rich text editing with Word-style ribbon (fonts, bold, italic, underline, lists, colors, alignment)
 - Auto-save every 3 seconds with manual save option
-- Share documents with other users by email
+- **Async collaboration** — share documents by email; shared users can edit (not live co-editing)
 - Dashboard tabs: **My Documents** | **Shared with Me**
 - Upload `.txt` or `.md` files to create editable documents
 - Persistent storage via Prisma + SQLite (local) / Turso (production)
@@ -21,8 +29,8 @@ A lightweight collaborative document editor built for the Ajaia LLC AI-Native Fu
 
 | Email | Password | Role |
 |-------|----------|------|
-| alice@demo.com | password123 | Document owner (use for create/share flows) |
-| bob@demo.com | password123 | Shared user (use to verify shared access) |
+| alice@demo.com | password123 | Document owner (create/share flows) |
+| bob@demo.com | password123 | Shared user (verify shared access) |
 
 ## Quick Start (Local)
 
@@ -34,21 +42,14 @@ A lightweight collaborative document editor built for the Ajaia LLC AI-Native Fu
 ### Setup
 
 ```bash
-# 1. Install dependencies
 npm install
-
-# 2. Copy environment file
 cp .env.example .env
-
-# 3. Create database and seed users
 npx prisma db push
 npm run db:seed
-
-# 4. Start dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and sign in with a demo account.
+Open [http://localhost:3000](http://localhost:3000) — landing page → **Sign In** → use a demo account.
 
 ### Scripts
 
@@ -57,13 +58,9 @@ Open [http://localhost:3000](http://localhost:3000) and sign in with a demo acco
 | `npm run dev` | Start development server |
 | `npm run build` | Production build |
 | `npm start` | Run production server |
-| `npm test` | Run automated tests |
+| `npm test` | Run automated tests (6 Vitest tests) |
 | `npm run db:push` | Sync Prisma schema to database |
 | `npm run db:seed` | Seed demo users |
-
-## Supported Upload Types
-
-Only **`.txt`** and **`.md`** files are supported. Other file types are rejected with a clear error message in the UI.
 
 ## Testing the Sharing Flow
 
@@ -74,49 +71,73 @@ Only **`.txt`** and **`.md`** files are supported. Other file types are rejected
 5. Open **Shared with Me** — the document should appear
 6. Bob can edit the document; refresh to confirm persistence
 
+## Supported Upload Types
+
+Only **`.txt`** and **`.md`** files are supported. Other file types are rejected with a clear error message in the UI.
+
 ## Deployment (Vercel + Turso)
 
-SQLite works locally but not on Vercel serverless (ephemeral filesystem). For production:
+SQLite works locally but **not** on Vercel serverless (ephemeral filesystem). Use Turso for production.
 
-1. Create a free [Turso](https://turso.tech) database
-2. Set `DATABASE_URL` in Vercel to your Turso connection string
-3. Set `JWT_SECRET` to a long random string
-4. Deploy:
+### 1. Create Turso database
 
 ```bash
+# Install Turso CLI: https://docs.turso.tech/cli
+turso db create raxha-docs
+turso db show raxha-docs --url
+turso db tokens create raxha-docs
+```
+
+Combine URL + token into `DATABASE_URL` (libSQL format).
+
+### 2. Deploy to Vercel
+
+1. Import [github.com/junaid1233/collab-docs-editor](https://github.com/junaid1233/collab-docs-editor) on [vercel.com](https://vercel.com)
+2. Set environment variables:
+   - `DATABASE_URL` — Turso connection string
+   - `JWT_SECRET` — 32+ character random string
+3. Deploy (build command: `prisma generate && next build`)
+
+Or via CLI:
+
+```bash
+npx vercel login
 npx vercel --prod
 ```
 
-5. Run seed against production DB (one time):
+### 3. Seed production database (one time)
 
 ```bash
 DATABASE_URL="your-turso-url" npm run db:seed
 ```
 
+### 4. Update docs
+
+Paste your live URL into `README.md`, `SUBMISSION.md`, and record the walkthrough (see `WALKTHROUGH_SCRIPT.md`).
+
+## Walkthrough Video
+
+Script: [`WALKTHROUGH_SCRIPT.md`](./WALKTHROUGH_SCRIPT.md)  
+Video URL: [`video-url.txt`](./video-url.txt) _(paste Loom/YouTube link after recording)_
+
 ## What's Working
 
-- Full auth flow with session cookies
+- Full auth flow with HttpOnly session cookies
 - Document CRUD with TipTap rich text persistence (JSON)
-- Sharing/unsharing with access enforcement
+- Sharing/unsharing with API-level access enforcement
 - File upload for `.txt` and `.md`
-- Auto-save and manual save
-- One automated test suite (6 tests)
+- Auto-save and manual save with status indicator
+- Word-style dark ribbon toolbar
+- Public landing page with product overview
+- Automated test suite (6 Vitest tests)
 
 ## Intentionally Out of Scope
 
-- Real-time collaborative editing (WebSockets/Yjs)
+- Real-time collaborative editing (WebSockets/Yjs) — async sharing instead
 - Comments, suggestions, version history
 - PDF/DOCX export
 - OAuth / enterprise RBAC
 - Paid third-party services
-
-## Next Steps (2–4 Hours)
-
-- Deploy to Vercel + Turso with CI seed step
-- Add read-only vs edit share permissions
-- Improve markdown import (nested lists, inline formatting)
-- Document version snapshots
-- E2E tests with Playwright
 
 ## Tech Stack
 
@@ -132,7 +153,7 @@ DATABASE_URL="your-turso-url" npm run db:seed
 ```
 src/
   app/              # Pages and API routes
-  components/       # UI components
+  components/       # UI, ribbon, landing, brand
   lib/              # Auth, Prisma, validation, access helpers
 prisma/
   schema.prisma     # Database schema
@@ -147,3 +168,17 @@ prisma/
 | `JWT_SECRET` | Secret for signing session tokens |
 
 See `.env.example` for a template.
+
+## Founder
+
+**Muhammad Junaid**
+
+- Portfolio: [junaid-portfolio-mu.vercel.app](https://junaid-portfolio-mu.vercel.app/)
+- LinkedIn: [linkedin.com/in/muhammad-junaid-56b051282](https://www.linkedin.com/in/muhammad-junaid-56b051282/)
+- GitHub: [github.com/junaid1233](https://github.com/junaid1233)
+
+## Related Docs
+
+- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — stack decisions and tradeoffs
+- [`SUBMISSION.md`](./SUBMISSION.md) — assessment checklist
+- [`AI_WORKFLOW.md`](./AI_WORKFLOW.md) — AI-assisted development notes
