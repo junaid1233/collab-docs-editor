@@ -1,0 +1,3 @@
+Paste your Loom or YouTube walkthrough URL here after recording.
+
+Example: https://youtu.be/your-video-id
