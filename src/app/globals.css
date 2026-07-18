@@ -1192,6 +1192,140 @@ body {
   color: #fff;
 }
 
+.raxha-logo-text-light {
+  color: var(--foreground);
+}
+
+/* ── Dashboard builder profile ── */
+.dashboard-builder-card {
+  height: fit-content;
+  padding: 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.dashboard-builder-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.dashboard-builder-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #0078d4, #005a9e);
+  border-radius: 12px;
+}
+
+.dashboard-builder-label {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.dashboard-builder-name {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.3;
+}
+
+.dashboard-builder-role {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--word-accent);
+}
+
+.dashboard-builder-bio {
+  margin-top: 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.dashboard-builder-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.dashboard-stat {
+  display: flex;
+  flex-direction: column;
+  padding: 0.65rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.dashboard-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.dashboard-stat-label {
+  margin-top: 0.15rem;
+  font-size: 0.6875rem;
+  color: var(--muted);
+}
+
+.dashboard-builder-links {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.dashboard-builder-links-label {
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.dashboard-builder-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.dashboard-portfolio-link {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--word-accent);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.dashboard-portfolio-link:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}
+
+@media (max-width: 1023px) {
+  .dashboard-builder-card {
+    order: -1;
+  }
+}
+
 .raxha-social-links {
   display: flex;
   align-items: center;

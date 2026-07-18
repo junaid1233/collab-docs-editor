@@ -9,13 +9,17 @@ const SIZES = {
 export function RaxhaLogo({
   size = "md",
   href,
+  theme = "dark",
   className = "",
 }: {
   size?: "sm" | "md" | "lg";
   href?: string;
+  theme?: "dark" | "light";
   className?: string;
 }) {
   const { icon, text } = SIZES[size];
+  const textClass =
+    theme === "light" ? "raxha-logo-text-light" : "raxha-logo-text";
 
   const content = (
     <>
@@ -33,7 +37,7 @@ export function RaxhaLogo({
           fill="#fff"
         />
       </svg>
-      <span className={`raxha-logo-text font-semibold tracking-tight ${text}`}>Raxha</span>
+      <span className={`${textClass} font-semibold tracking-tight ${text}`}>Raxha</span>
     </>
   );
 

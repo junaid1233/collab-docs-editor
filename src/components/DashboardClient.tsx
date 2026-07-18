@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { BuilderProfile } from "@/components/brand/BuilderProfile";
+import { RaxhaLogo } from "@/components/brand/RaxhaLogo";
 
 type DocumentItem = {
   id: string;
@@ -142,12 +144,16 @@ export function DashboardClient({ userName, owned, shared }: DashboardProps) {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <div>
-            <h1 className="text-xl font-bold">Raxha</h1>
-            <p className="text-sm text-muted">Welcome, {userName}</p>
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+          <div className="flex items-center gap-4">
+            <RaxhaLogo size="sm" href="/" theme="light" />
+            <div className="hidden h-8 w-px bg-border sm:block" aria-hidden />
+            <div>
+              <p className="text-sm font-medium text-foreground">Welcome, {userName}</p>
+              <p className="text-xs text-muted">Your documents dashboard</p>
+            </div>
           </div>
           <button
             onClick={handleLogout}
@@ -158,8 +164,11 @@ export function DashboardClient({ userName, owned, shared }: DashboardProps) {
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="mx-auto grid max-w-6xl gap-8 px-6 py-8 lg:grid-cols-[280px_1fr]">
+        <BuilderProfile ownedCount={owned.length} sharedCount={shared.length} />
+
+        <main>
+          <div className="mb-6 flex flex-wrap items-center gap-3">
           <button
             onClick={handleCreateDocument}
             disabled={loading}
@@ -226,7 +235,8 @@ export function DashboardClient({ userName, owned, shared }: DashboardProps) {
             emptyDescription="When someone shares a document with your account, it will appear here."
           />
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

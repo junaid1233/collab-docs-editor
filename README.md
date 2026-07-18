@@ -107,8 +107,17 @@ npx vercel --prod
 
 ### 3. Seed production database (one time)
 
+Prisma CLI `db push` only works with local `file:` URLs. For Turso, apply schema then seed:
+
 ```bash
-DATABASE_URL="your-turso-url" npm run db:seed
+# Set your full Turso URL (with authToken query param)
+export DATABASE_URL="libsql://raxha-docs-YOU.aws-us-west-2.turso.io?authToken=YOUR_TOKEN"
+
+# Apply tables to Turso
+npx tsx prisma/push-turso.ts
+
+# Seed demo users
+npm run db:seed
 ```
 
 ### 4. Update docs
