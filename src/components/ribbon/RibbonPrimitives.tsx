@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { IconChevronDown, IconGroupLauncher, IconAlignLeft, IconAlignCenter, IconAlignRight, IconAlignJustify } from "./RibbonIcons";
 
 export function RibbonDivider() {
@@ -137,27 +137,59 @@ export function RibbonSelect({
   onChange: (value: string) => void;
   className?: string;
 }) {
-  const id = useId();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [open]);
+
+  const selectedLabel =
+    displayValue ??
+    options.find((opt) => opt.value === value)?.label ??
+    value;
+
   return (
-    <div className={`ribbon-select-wrap ${className}`}>
-      <label htmlFor={id} className="sr-only">
-        {label}
-      </label>
-      <select
-        id={id}
+    <div ref={ref} className={`ribbon-select-wrap ${className}`}>
+      <button
+        type="button"
         aria-label={label}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="ribbon-select"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={`ribbon-select-trigger ${open ? "ribbon-select-trigger-open" : ""}`}
       >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      <span className="ribbon-select-display">{displayValue ?? value}</span>
-      <IconChevronDown size={7} className="ribbon-select-chevron" />
+        <span className="ribbon-select-display">{selectedLabel}</span>
+        <IconChevronDown size={7} className="ribbon-select-chevron" />
+      </button>
+      {open ? (
+        <ul className="ribbon-select-menu" role="listbox" aria-label={label}>
+          {options.map((opt) => (
+            <li key={opt.value} role="none">
+              <button
+                type="button"
+                role="option"
+                aria-selected={opt.value === value}
+                className={`ribbon-select-option ${opt.value === value ? "ribbon-select-option-active" : ""}`}
+                style={{ fontFamily: opt.value }}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+              >
+                {opt.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
     </div>
   );
 }
