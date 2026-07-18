@@ -1,0 +1,49 @@
+---
+description: Naming, imports, and TypeScript/React patterns for Ajaia Docs.
+alwaysApply: true
+---
+
+# Conventions
+
+## Naming
+
+| Thing | File | Symbol | Example |
+|-------|------|--------|---------|
+| API route | `route.ts` in folder | `GET`, `POST`, `PATCH`, `DELETE` | `src/app/api/documents/route.ts` |
+| Server page | `page.tsx` | default export | `DashboardPage` |
+| Client component | `PascalCase.tsx` | named export | `DashboardClient` |
+| Lib module | `kebab or single word.ts` | named functions | `getDocumentAccess` |
+| Zod schema | `*Schema` | `loginSchema` | `src/lib/validation.ts` |
+| Test | `*.test.ts` next to source | `describe` / `it` | `validation.test.ts` |
+| TipTap extension | `custom-extensions.ts` | `Extension.create` | `FontSize` |
+
+## Imports
+
+- **Always** use `@/` alias (`@/lib/auth`, `@/components/...`)
+- **Never** deep relative imports across layers (`../../lib/...`)
+- No barrel `index.ts` files — import from concrete paths
+
+## Patterns
+
+```typescript
+// API route handler shape
+export async function POST(request: NextRequest) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const parsed = someSchema.safeParse(await request.json());
+  if (!parsed.success) return NextResponse.json({ error: "..." }, { status: 400 });
+  // prisma + return
+}
+
+// Client component
+"use client";
+export function Foo({ initialData }: { initialData: ... }) { ... }
+```
+
+## Forbidden
+
+- ❌ `any` — use explicit types or `unknown` + narrow
+- ❌ Default exports in `src/lib/**` (components/pages use default where Next requires)
+- ❌ `prisma` in `src/components/**`
+- ❌ Raw SQL — use Prisma client only
+- ❌ Committing `.env` — use `.env.example`

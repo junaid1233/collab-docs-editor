@@ -1,0 +1,69 @@
+---
+description: Layer boundaries, data flow, and hard constraints for the Ajaia Docs Next.js monolith.
+alwaysApply: true
+---
+
+# Architecture
+
+## Data flow
+
+```
+Browser → middleware.ts (JWT cookie) → App Router page OR API route
+                                              ↓
+                                    src/lib/* (auth, documents, validation)
+                                              ↓
+                                    src/lib/prisma.ts → Prisma → SQLite
+```
+
+Client components call `/api/*` via `fetch`; server pages may call `prisma` directly.
+
+## Layer boundaries
+
+| Layer | Path | Does | Must NOT |
+|-------|------|------|----------|
+| Middleware | `src/middleware.ts` | JWT gate, redirect unauthenticated | DB queries, business rules |
+| API routes | `src/app/api/**/route.ts` | Auth check, Zod validate, HTTP status | TipTap/UI logic, direct cookie writes except via `lib/auth` |
+| Server pages | `src/app/**/page.tsx` | SSR data fetch, pass props to client | Client-only APIs (`useState` without `"use client"`) |
+| Client components | `src/components/**` | UI, `fetch` to API, TipTap | Direct `prisma` import |
+| Domain lib | `src/lib/**` | Auth, access rules, validation, TipTap extensions | `NextResponse`, JSX |
+| DB | `prisma/schema.prisma` | Schema, relations | Application logic |
+
+## Imports
+
+```typescript
+// ✅ API route
+import { getSession } from "@/lib/auth";
+import { getDocumentAccess } from "@/lib/documents";
+import { prisma } from "@/lib/prisma";
+
+// ❌ Client component
+import { prisma } from "@/lib/prisma";
+
+// ❌ lib layer
+import { NextResponse } from "next/server";
+```
+
+## DI / wiring
+
+- **Prisma**: singleton in `src/lib/prisma.ts` (dev hot-reload safe)
+- **Auth**: `getSession()` / `createSession()` from `src/lib/auth.ts` — no global user context
+- **Env**: `JWT_SECRET`, `DATABASE_URL` via `process.env`; never hard-code secrets
+
+## Directory tree
+
+```
+src/app/           Routes (pages + API)
+src/components/    React UI; ribbon/ = Word toolbar
+src/lib/           Domain + auth + validation + tiptap/
+src/middleware.ts  Auth gate
+prisma/            schema.prisma, seed.ts
+```
+
+## Hard constraints
+
+- Every API route: `getSession()` first → 401 if missing
+- Document access: use `getDocumentAccess()` / `isDocumentOwner()` — never roll custom checks
+- Validate all request bodies with Zod schemas from `src/lib/validation.ts`
+- TipTap editor: client-only via `DocumentEditorLoader` (`dynamic`, `ssr: false`)
+- `"use client"` only where hooks/events/browser APIs are required
+- SQLite local; production needs Turso/libSQL — do not assume file DB on Vercel

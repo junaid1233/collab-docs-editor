@@ -1,0 +1,34 @@
+# Ajaia Docs — Cursor rules summary
+
+Collaborative document editor (Next.js 15 + TipTap + Prisma/SQLite). Full rules in `.cursor/rules/`; reference docs in `.cursor/docs/`.
+
+## Stack
+
+Next.js 15 · React 19 · TypeScript 5 · Prisma 6 · SQLite · TipTap 2 · jose JWT · Zod · Vitest · Tailwind 4
+
+## Hard rules
+
+- API routes: `getSession()` → Zod validate → `lib/` + prisma → JSON response
+- Document access via `getDocumentAccess()` / `isDocumentOwner()` only
+- No `prisma` in client components
+- TipTap via `DocumentEditorLoader` with `ssr: false`
+- Imports use `@/` alias
+- No `any`; no secrets in repo
+
+## Tests
+
+```bash
+npm test
+```
+
+## Full documentation
+
+@mention or read:
+- `.cursor/docs/architecture.md`
+- `.cursor/docs/conventions.md`
+- `.cursor/docs/code-structure.md`
+- `.cursor/docs/api-integration.md`
+- `.cursor/docs/testing.md`
+- `.cursor/docs/local-dev.md`
+
+Always-on rules: `.cursor/rules/*.mdc`

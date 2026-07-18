@@ -9,6 +9,23 @@
   --primary-hover: #1d4ed8;
   --muted: #64748b;
   --danger: #dc2626;
+
+  /* MS Word dark ribbon tokens */
+  --word-app-bg: #191919;
+  --word-ribbon-bg: #2b2b2b;
+  --word-ribbon-border: #1f1f1f;
+  --word-ribbon-hover: #3a3a3a;
+  --word-ribbon-active: #454545;
+  --word-ribbon-text: #ffffff;
+  --word-ribbon-muted: #c8c8c8;
+  --word-ribbon-label: #9a9a9a;
+  --word-accent: #0078d4;
+  --word-menu-bg: #2b2b2b;
+  --word-menu-border: #6e6e6e;
+  --word-select-bg: #333333;
+  --word-select-border: #5a5a5a;
+  --word-page-bg: #1a1a1a;
+  --word-canvas-bg: #ffffff;
 }
 
 @theme inline {
@@ -29,11 +46,606 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-.ProseMirror {
-  min-height: 480px;
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Word Editor Shell ── */
+.word-editor-root {
+  background: var(--word-app-bg);
+  color: var(--word-ribbon-text);
+  font-family: "Segoe UI", "Segoe UI Web", system-ui, sans-serif;
+}
+
+.word-editor-header {
+  background: #1f1f1f;
+  border-bottom: 1px solid #111;
+}
+
+.word-editor-header-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1rem;
+  max-width: 100%;
+}
+
+.word-header-link {
+  font-size: 0.8125rem;
+  color: #6cb4ff;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.word-header-link:hover {
+  color: #9ecdff;
+  text-decoration: underline;
+}
+
+.word-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.word-save-status {
+  font-size: 0.8125rem;
+  color: var(--word-ribbon-label);
+}
+
+.word-header-btn {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8125rem;
+  border: 1px solid #555;
+  border-radius: 4px;
+  background: #333;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.word-header-btn:hover {
+  background: #444;
+  border-color: #777;
+}
+
+.word-header-btn-primary {
+  background: var(--word-accent);
+  border-color: var(--word-accent);
+}
+
+.word-header-btn-primary:hover {
+  background: #1084d8;
+}
+
+.word-header-btn-danger {
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+.word-header-btn-danger:hover {
+  background: rgba(127, 29, 29, 0.3);
+}
+
+.word-header-shared {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8125rem;
+  color: var(--word-ribbon-label);
+  background: #333;
+  border-radius: 4px;
+}
+
+.word-title-input {
+  min-width: 180px;
+  flex: 1;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.875rem;
+  color: var(--word-ribbon-text);
   outline: none;
-  padding: 1.5rem;
-  line-height: 1.7;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.word-title-input:hover,
+.word-title-input:focus {
+  border-color: var(--word-select-border);
+  background: #333;
+}
+
+.word-editor-workspace {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 48px);
+}
+
+.word-editor-error {
+  margin: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  background: rgba(220, 38, 38, 0.15);
+  color: #fca5a5;
+  font-size: 0.875rem;
+}
+
+.word-document-page {
+  flex: 1;
+  margin: 0;
+  background: var(--word-page-bg);
+  padding: 1.5rem clamp(0.75rem, 3vw, 2rem) 3rem;
+}
+
+.word-document-page .ProseMirror {
+  max-width: 816px;
+  margin: 0 auto;
+  min-height: 1056px;
+  background: var(--word-canvas-bg);
+  color: #000;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  padding: 96px clamp(48px, 8vw, 96px);
+  line-height: 1.5;
+  font-family: Aptos, "Segoe UI", Calibri, sans-serif;
+  font-size: 12pt;
+}
+
+/* ── Word Ribbon ── */
+.word-ribbon-shell {
+  background: var(--word-ribbon-bg);
+  border-bottom: 1px solid var(--word-ribbon-border);
+  user-select: none;
+}
+
+.word-ribbon-tabs {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  padding: 0 0.5rem;
+  background: #1f1f1f;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.word-ribbon-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.word-ribbon-tab {
+  position: relative;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.8125rem;
+  color: var(--word-ribbon-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+
+.word-ribbon-tab:hover:not(:disabled) {
+  color: #fff;
+  background: #333;
+}
+
+.word-ribbon-tab:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.word-ribbon-tab-active {
+  color: #fff;
+  background: var(--word-ribbon-bg);
+}
+
+.word-ribbon-tab-active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: var(--word-accent);
+}
+
+.word-ribbon-content {
+  padding: 0.35rem 0.5rem 0.25rem;
+}
+
+.word-ribbon-scroll {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
+}
+
+.ribbon-divider {
+  width: 1px;
+  align-self: stretch;
+  background: #454545;
+  margin: 0.25rem 0.35rem;
+  flex-shrink: 0;
+}
+
+.ribbon-group {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.15rem 0.35rem 0;
+  flex-shrink: 0;
+}
+
+.ribbon-group-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.ribbon-group-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  margin-top: 0.15rem;
+  padding-top: 0.1rem;
+  border-top: 1px solid transparent;
+  position: relative;
+}
+
+.ribbon-group-label {
+  font-size: 0.6875rem;
+  color: var(--word-ribbon-label);
+  line-height: 1;
+}
+
+.ribbon-group-launcher {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--word-ribbon-label);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.ribbon-group:hover .ribbon-group-launcher {
+  opacity: 1;
+}
+
+.ribbon-row {
+  display: flex;
+  align-items: center;
+  gap: 1px;
+  flex-wrap: nowrap;
+}
+
+.ribbon-btn,
+.ribbon-split-main,
+.ribbon-split-arrow,
+.ribbon-dropdown-trigger,
+.ribbon-align-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--word-ribbon-text);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.ribbon-btn:hover:not(:disabled),
+.ribbon-split-main:hover,
+.ribbon-split-arrow:hover,
+.ribbon-dropdown-trigger:hover,
+.ribbon-align-btn:hover {
+  background: var(--word-ribbon-hover);
+  border-color: #555;
+}
+
+.ribbon-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.ribbon-btn-active,
+.ribbon-split-main.ribbon-btn-active,
+.ribbon-split-arrow.ribbon-btn-active,
+.ribbon-dropdown-trigger.ribbon-btn-active,
+.ribbon-align-btn.ribbon-btn-active {
+  background: var(--word-ribbon-active);
+  border-color: #666;
+}
+
+.ribbon-font-btn {
+  font-family: "Segoe UI", serif;
+  font-size: 0.875rem;
+  min-width: 14px;
+}
+
+.ribbon-strike {
+  font-size: 0.75rem;
+  text-decoration: line-through;
+}
+
+.ribbon-case-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+/* Split button */
+.ribbon-split,
+.ribbon-dropdown,
+.ribbon-split-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.ribbon-split {
+  align-items: stretch;
+}
+
+.ribbon-split-main {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.ribbon-split-arrow {
+  min-width: 14px;
+  padding: 0 2px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.ribbon-dropdown-trigger {
+  gap: 2px;
+}
+
+/* Large paste button */
+.ribbon-clipboard-layout {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.ribbon-clipboard-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ribbon-large-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-width: 52px;
+  height: 100%;
+  padding: 0.25rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--word-ribbon-text);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.ribbon-large-btn:hover {
+  background: var(--word-ribbon-hover);
+  border-color: #555;
+}
+
+.ribbon-large-btn-label {
+  font-size: 0.6875rem;
+  color: var(--word-ribbon-muted);
+}
+
+/* Selects */
+.ribbon-select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.ribbon-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.ribbon-select-display {
+  display: block;
+  height: 26px;
+  line-height: 26px;
+  padding: 0 18px 0 6px;
+  font-size: 0.75rem;
+  color: var(--word-ribbon-text);
+  background: var(--word-select-bg);
+  border: 1px solid var(--word-select-border);
+  border-radius: 3px;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ribbon-select-chevron {
+  position: absolute;
+  right: 5px;
+  pointer-events: none;
+  color: var(--word-ribbon-muted);
+}
+
+.ribbon-font-select .ribbon-select-display {
+  min-width: 120px;
+  max-width: 140px;
+}
+
+.ribbon-size-select .ribbon-select-display {
+  min-width: 32px;
+  max-width: 40px;
+  text-align: center;
+  padding-right: 14px;
+}
+
+/* Align group */
+.ribbon-align-group {
+  display: inline-flex;
+  border: 1px solid #555;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.ribbon-align-btn {
+  border-radius: 0;
+  border: none;
+  min-width: 28px;
+}
+
+.ribbon-align-btn + .ribbon-align-btn {
+  border-left: 1px solid #555;
+}
+
+/* Menus */
+.ribbon-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  z-index: 100;
+  min-width: 160px;
+  background: var(--word-menu-bg);
+  border: 1px solid var(--word-menu-border);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  padding: 2px 0;
+}
+
+.ribbon-menu-right {
+  left: auto;
+  right: 0;
+}
+
+.ribbon-menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.35rem 0.75rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  color: var(--word-ribbon-text);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.ribbon-menu-item:hover,
+.ribbon-menu-item-active {
+  background: var(--word-ribbon-hover);
+}
+
+.ribbon-menu-separator {
+  height: 1px;
+  margin: 0.25rem 0;
+  background: #555;
+}
+
+.ribbon-color-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 3px;
+  padding: 0.5rem;
+}
+
+.ribbon-color-swatch {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #666;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.ribbon-color-swatch:hover {
+  transform: scale(1.1);
+}
+
+/* Underline menu */
+.ribbon-underline-menu {
+  min-width: 180px;
+  padding: 0.35rem 0;
+}
+
+.ribbon-underline-previews {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+.ribbon-underline-preview-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 22px;
+  padding: 0 0.5rem;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: var(--word-ribbon-text);
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.ribbon-underline-preview-btn:hover {
+  border-color: #888;
+  background: var(--word-ribbon-hover);
+}
+
+.ribbon-underline-color-row {
+  padding: 0.35rem 0.75rem 0.5rem;
+}
+
+.ribbon-underline-color-label {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--word-ribbon-text);
+  margin-bottom: 0.35rem;
+}
+
+.ribbon-underline-color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+/* ── ProseMirror content styles ── */
+.ProseMirror {
+  outline: none;
 }
 
 .ProseMirror h1 {
@@ -48,14 +660,26 @@ body {
   margin: 0.875rem 0 0.5rem;
 }
 
+.ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+}
+
+.ProseMirror h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.75rem 0 0.5rem;
+}
+
 .ProseMirror p {
-  margin: 0.5rem 0;
+  margin: 0;
 }
 
 .ProseMirror ul,
 .ProseMirror ol {
   padding-left: 1.5rem;
-  margin: 0.5rem 0;
+  margin: 0.25rem 0;
 }
 
 .ProseMirror ul {
@@ -68,4 +692,101 @@ body {
 
 .ProseMirror u {
   text-decoration: underline;
+}
+
+.ProseMirror mark {
+  border-radius: 2px;
+  padding: 0 2px;
+}
+
+.ProseMirror sub {
+  font-size: 0.75em;
+  vertical-align: sub;
+}
+
+.ProseMirror sup {
+  font-size: 0.75em;
+  vertical-align: super;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid #ccc;
+  margin: 0.75rem 0;
+  padding-left: 1rem;
+  color: #666;
+}
+
+.ProseMirror hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 1rem 0;
+}
+
+.ProseMirror [style*="text-align: center"] {
+  text-align: center;
+}
+
+.ProseMirror [style*="text-align: right"] {
+  text-align: right;
+}
+
+.ProseMirror [style*="text-align: justify"] {
+  text-align: justify;
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .ribbon-group-paragraph .ribbon-row:last-child .ribbon-align-group {
+    order: -1;
+  }
+
+  .ribbon-font-select .ribbon-select-display {
+    min-width: 90px;
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .word-ribbon-tab {
+    padding: 0.4rem 0.55rem;
+    font-size: 0.75rem;
+  }
+
+  .ribbon-group-label {
+    font-size: 0.625rem;
+  }
+
+  .ribbon-clipboard-layout {
+    flex-direction: column;
+  }
+
+  .ribbon-large-btn {
+    flex-direction: row;
+    min-width: auto;
+    height: 32px;
+    padding: 0 0.5rem;
+  }
+
+  .ribbon-clipboard-stack {
+    flex-direction: row;
+  }
+
+  .word-document-page .ProseMirror {
+    min-height: 70vh;
+    padding: 48px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .word-editor-header-inner {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .ribbon-group-font .ribbon-row:first-child {
+    flex-wrap: wrap;
+  }
+
+  .ribbon-font-select .ribbon-select-display {
+    min-width: 100%;
+  }
 }

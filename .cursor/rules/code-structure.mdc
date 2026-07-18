@@ -1,0 +1,48 @@
+---
+description: File/function size limits and TypeScript React rules; enforce before completing tasks.
+alwaysApply: true
+---
+
+# Code Structure
+
+## Universal thresholds
+
+| Rule | Warn | Hard limit |
+|------|------|------------|
+| File length | >300 lines | >500 lines |
+| Function/method | >40 lines | >75 lines |
+| Class/component file | >200 lines | — |
+| Nesting depth | >3 levels | — |
+| Parameters | >4 | group into object |
+| Single responsibility | one primary concern per file | — |
+
+Exclude: generated files, `package-lock.json`, `globals.css` (styles).
+
+## TypeScript / React (this project)
+
+- No `any` — use `unknown` and narrow, or define types
+- Named exports for lib and shared components; default export only for Next `page.tsx` / `layout.tsx`
+- One primary component per file; private sub-components co-located OK
+- Custom hooks >60 lines → split
+- No business logic in components — access checks live in `src/lib/documents.ts`; validation in `src/lib/validation.ts`
+- No direct `prisma` in components — use API routes or server pages
+- Client `fetch` to `/api/*` only; no external API URLs in components
+
+## Next.js API routes (this project)
+
+- Handlers: auth → validate (Zod) → lib/prisma → `NextResponse.json`
+- Return `{ error: string }` with correct status; catch blocks return 500 JSON, never throw to client
+- Route params: `params: Promise<{ id: string }>` — always `await params`
+- Keep handlers readable; extract repeated logic to `src/lib/**`
+
+## Enforcement
+
+Before marking any task complete, check every touched file against thresholds. Fix or flag violations with file + line range.
+
+## Known violations (refactor when editing)
+
+| File | Lines | Action |
+|------|-------|--------|
+| `src/components/ribbon/WordRibbon.tsx` | ~504 | Split into ClipboardGroup, FontGroup, ParagraphGroup |
+| `src/components/DocumentEditor.tsx` | ~336 | Extract share modal + save hook |
+| `src/components/ribbon/RibbonPrimitives.tsx` | ~335 | Split menu vs button primitives |

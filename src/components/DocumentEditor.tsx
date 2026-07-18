@@ -3,9 +3,24 @@
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import TextAlign from "@tiptap/extension-text-align";
+import TextStyle from "@tiptap/extension-text-style";
+import Color from "@tiptap/extension-color";
+import Highlight from "@tiptap/extension-highlight";
+import Subscript from "@tiptap/extension-subscript";
+import Superscript from "@tiptap/extension-superscript";
+import FontFamily from "@tiptap/extension-font-family";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { EditorToolbar } from "@/components/EditorToolbar";
+import { FontSize } from "@/lib/tiptap/extensions";
+import {
+  CustomBulletList,
+  CustomOrderedList,
+  LineHeight,
+  UnderlineStyle,
+} from "@/lib/tiptap/custom-extensions";
 
 type ShareUser = {
   id: string;
@@ -23,33 +38,6 @@ type DocumentEditorProps = {
 };
 
 type SaveState = "saved" | "saving" | "unsaved" | "error";
-
-function ToolbarButton({
-  onClick,
-  active,
-  children,
-  title,
-}: {
-  onClick: () => void;
-  active?: boolean;
-  children: React.ReactNode;
-  title: string;
-}) {
-  return (
-    <button
-      type="button"
-      title={title}
-      onClick={onClick}
-      className={`rounded-md px-2.5 py-1.5 text-sm font-medium ${
-        active
-          ? "bg-primary text-white"
-          : "bg-white text-foreground hover:bg-slate-100"
-      }`}
-    >
-      {children}
-    </button>
-  );
-}
 
 export function DocumentEditor({
   documentId,
@@ -77,7 +65,26 @@ export function DocumentEditor({
   }, [initialContent]);
 
   const editor = useEditor({
-    extensions: [StarterKit, Underline],
+    extensions: [
+      StarterKit.configure({
+        bulletList: false,
+        orderedList: false,
+        heading: { levels: [1, 2, 3, 4] },
+      }),
+      CustomBulletList,
+      CustomOrderedList,
+      Underline,
+      UnderlineStyle,
+      TextStyle,
+      FontFamily,
+      FontSize,
+      Color,
+      Highlight.configure({ multicolor: true }),
+      Subscript,
+      Superscript,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      LineHeight,
+    ],
     content: parsedContent,
     editorProps: {
       attributes: {
@@ -202,10 +209,10 @@ export function DocumentEditor({
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-card">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-6 py-4">
-          <Link href="/dashboard" className="text-sm text-primary hover:underline">
+    <div className="word-editor-root min-h-screen">
+      <header className="word-editor-header">
+        <div className="word-editor-header-inner">
+          <Link href="/dashboard" className="word-header-link">
             ← Dashboard
           </Link>
           <input
@@ -214,10 +221,10 @@ export function DocumentEditor({
               setTitle(event.target.value);
               setSaveState("unsaved");
             }}
-            className="min-w-[240px] flex-1 rounded-lg border border-border px-3 py-2 text-lg font-semibold outline-none focus:border-primary"
+            className="word-title-input"
           />
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted">
+          <div className="word-header-actions">
+            <span className="word-save-status">
               {saveState === "saved" && "Saved"}
               {saveState === "saving" && "Saving..."}
               {saveState === "unsaved" && "Unsaved changes"}
@@ -225,7 +232,7 @@ export function DocumentEditor({
             </span>
             <button
               onClick={() => void saveDocument()}
-              className="rounded-lg border border-border px-3 py-2 text-sm hover:bg-slate-50"
+              className="word-header-btn"
             >
               Save now
             </button>
@@ -233,19 +240,19 @@ export function DocumentEditor({
               <>
                 <button
                   onClick={() => setShowShareModal(true)}
-                  className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary-hover"
+                  className="word-header-btn word-header-btn-primary"
                 >
                   Share
                 </button>
                 <button
                   onClick={() => void handleDelete()}
-                  className="rounded-lg border border-red-200 px-3 py-2 text-sm text-danger hover:bg-red-50"
+                  className="word-header-btn word-header-btn-danger"
                 >
                   Delete
                 </button>
               </>
             ) : (
-              <span className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-muted">
+              <span className="word-header-shared">
                 Shared by {ownerEmail}
               </span>
             )}
@@ -253,64 +260,14 @@ export function DocumentEditor({
         </div>
       </header>
 
-      <div className="mx-auto max-w-5xl px-6 py-4">
-        <div className="mb-4 flex flex-wrap gap-2 rounded-xl border border-border bg-card p-2">
-          <ToolbarButton
-            title="Bold"
-            active={editor.isActive("bold")}
-            onClick={() => editor.chain().focus().toggleBold().run()}
-          >
-            B
-          </ToolbarButton>
-          <ToolbarButton
-            title="Italic"
-            active={editor.isActive("italic")}
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-          >
-            I
-          </ToolbarButton>
-          <ToolbarButton
-            title="Underline"
-            active={editor.isActive("underline")}
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-          >
-            U
-          </ToolbarButton>
-          <ToolbarButton
-            title="Heading 1"
-            active={editor.isActive("heading", { level: 1 })}
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-          >
-            H1
-          </ToolbarButton>
-          <ToolbarButton
-            title="Heading 2"
-            active={editor.isActive("heading", { level: 2 })}
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-          >
-            H2
-          </ToolbarButton>
-          <ToolbarButton
-            title="Bullet list"
-            active={editor.isActive("bulletList")}
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-          >
-            • List
-          </ToolbarButton>
-          <ToolbarButton
-            title="Numbered list"
-            active={editor.isActive("orderedList")}
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          >
-            1. List
-          </ToolbarButton>
-        </div>
+      <div className="word-editor-workspace">
+        <EditorToolbar editor={editor} />
 
         {error ? (
-          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-danger">{error}</p>
+          <p className="word-editor-error">{error}</p>
         ) : null}
 
-        <div className="rounded-xl border border-border bg-card shadow-sm">
+        <div className="word-document-page">
           <EditorContent editor={editor} />
         </div>
       </div>

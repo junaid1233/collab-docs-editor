@@ -1,0 +1,67 @@
+---
+description: API route patterns, auth, validation, and error contracts for Next.js route handlers.
+globs: ["src/app/api/**/*.ts", "src/lib/auth.ts", "src/lib/documents.ts", "src/lib/validation.ts"]
+---
+
+# API Integration
+
+## Request chain
+
+```
+fetch("/api/...") → middleware (JWT) → route.ts → getSession()
+    → Zod safeParse → getDocumentAccess (if doc) → prisma → NextResponse.json
+```
+
+## Add endpoint checklist
+
+1. Schema in `src/lib/validation.ts`
+2. `src/app/api/<path>/route.ts` — export HTTP method(s)
+3. Auth: `getSession()` → 401
+4. Authorization: `getDocumentAccess` / `isDocumentOwner` → 403/404
+5. Client: add `fetch` in relevant `*Client.tsx` component
+
+## Template
+
+```typescript
+export async function POST(request: NextRequest) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  try {
+    const parsed = mySchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "Invalid input" }, { status: 400 });
+    }
+    const result = await prisma....;
+    return NextResponse.json({ result }, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Failed to ..." }, { status: 500 });
+  }
+}
+```
+
+## Error contract
+
+| Layer | On failure | Never |
+|-------|------------|-------|
+| Route | `NextResponse.json({ error }, status)` | Uncaught throw to client |
+| Auth | 401 `{ error: "Unauthorized" }` | Leak whether email exists (login uses generic message) |
+| Access | 404 `{ error: "Document not found" }` for unauthorized read | 403 with doc title for non-existent ID |
+| Validation | 400 with first Zod message | 500 for validation errors |
+
+## Body patterns
+
+- JSON CRUD: `request.json()` + Zod
+- Upload: `request.formData()` — see `src/app/api/documents/upload/route.ts`
+- Document content: TipTap JSON stored as **string** in `Document.content`
+
+## Status codes used
+
+| Code | When |
+|------|------|
+| 201 | Created (document, share) |
+| 400 | Zod / bad input |
+| 401 | No session |
+| 403 | Forbidden (not owner for share/delete) |
+| 404 | Not found / no access |
+| 409 | Duplicate share |
+| 500 | Unexpected server error |

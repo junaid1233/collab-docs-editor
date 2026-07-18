@@ -1,0 +1,34 @@
+---
+description: End every code-changing task with a structured delivery summary (PR bullets + suggested commit message).
+alwaysApply: true
+---
+
+# Delivery Summary (mandatory after code changes)
+
+When a task **changes code** (creates, edits, or deletes project files), end the final response with the section below.
+
+**Skip** for Q&A, read-only exploration, reviews with no edits, or pure explanation tasks.
+
+**Do not** run `git commit`, `git push`, or open a PR unless the user explicitly asks.
+
+## Required closing format
+
+```markdown
+## Delivery summary
+
+### PR Description
+- [Specific change: file/feature/behavior — not generic filler]
+- [Another concrete bullet if applicable]
+
+### Suggested commit message
+Imperative subject max 72 chars
+
+Optional one-line why if it adds context.
+```
+
+## Rules
+
+- **PR Description**: bullets only; name what changed (pages, APIs, components, config). No "improved code quality" without specifics.
+- **Suggested commit message**: imperative mood (`Add`, `Fix`, `Update`), ≤72 char subject; body optional, one line max.
+- Never auto-commit or auto-PR.
+- If the task was read-only, omit this entire section.

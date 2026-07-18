@@ -1,0 +1,51 @@
+---
+description: Vitest unit test patterns, location, and commands for Ajaia Docs.
+globs: ["**/*.test.ts", "**/*.spec.ts", "vitest.config.ts"]
+---
+
+# Testing
+
+## Structure
+
+| Type | Location | Naming |
+|------|----------|--------|
+| Unit | `src/**/*.test.ts` | co-located with module |
+| Config | `vitest.config.ts` | `@/` alias |
+
+No E2E tests yet. No `__tests__/` directory.
+
+## Template
+
+```typescript
+import { describe, expect, it } from "vitest";
+import { isAllowedUpload } from "./validation";
+
+describe("file upload validation", () => {
+  it("accepts txt and md extensions", () => {
+    expect(isAllowedUpload("notes.txt")).toBe(true);
+  });
+});
+```
+
+## What to test
+
+- ✅ Pure functions: `src/lib/validation.ts`, access rule logic
+- ✅ Zod edge cases, markdown/plain import helpers
+- ❌ Prisma/DB in unit tests (no test DB wired)
+- ❌ Full TipTap editor (client-only, no RTL setup)
+
+## Mocks
+
+No mock framework configured. For access tests, use inline pure functions mirroring `getDocumentAccess` rules (see `validation.test.ts`).
+
+## Commands
+
+```bash
+npm test              # vitest run (all)
+npm run test:watch    # watch mode
+npx vitest run src/lib/validation.test.ts  # single file
+```
+
+## Coverage
+
+Not enforced. Prefer meaningful business-rule tests over coverage percentage.
