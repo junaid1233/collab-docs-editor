@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import { RaxhaLogo } from "@/components/brand/RaxhaLogo";
 
 export function LoginForm() {
   const router = useRouter();
@@ -39,10 +40,10 @@ export function LoginForm() {
 
   return (
     <div className="mx-auto w-full max-w-md rounded-2xl border border-border bg-card p-8 shadow-sm">
-      <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-foreground">Ajaia Docs</h1>
-        <p className="mt-2 text-sm text-muted">
-          Lightweight collaborative document editor
+      <div className="mb-8 flex flex-col items-center text-center">
+        <RaxhaLogo size="lg" href="/" className="mb-3" />
+        <p className="text-sm text-muted">
+          Write together. Format like Word. Share in one click.
         </p>
       </div>
 

@@ -24,7 +24,7 @@ function useRibbonFloatingMenu(
     containerRef?: RefObject<HTMLElement | null>;
   },
 ) {
-  const menuRef = useRef<HTMLElement | null>(null);
+  const menuRef = useRef<HTMLDivElement | null>(null);
   const [menuStyle, setMenuStyle] = useState<CSSProperties>({});
   const maxHeight = options?.maxHeight ?? 320;
   const align = options?.align ?? "left";
@@ -275,7 +275,7 @@ export function RibbonSelect({
 
   const menu = open ? (
     <ul
-      ref={menuRef}
+      ref={menuRef as RefObject<HTMLUListElement | null>}
       className="ribbon-select-menu ribbon-select-menu-portal"
       role="listbox"
       aria-label={label}

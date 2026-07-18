@@ -856,3 +856,419 @@ body {
     min-width: 100%;
   }
 }
+
+/* ── Raxha Landing Page ── */
+.raxha-landing {
+  min-height: 100vh;
+  background: var(--word-app-bg);
+  color: var(--word-ribbon-text);
+  font-family: "Segoe UI", "Segoe UI Web", system-ui, sans-serif;
+}
+
+.raxha-container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+.raxha-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid #2a2a2a;
+  background: rgba(25, 25, 25, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.raxha-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+}
+
+.raxha-nav-links {
+  display: none;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.raxha-nav-links a {
+  font-size: 0.875rem;
+  color: var(--word-ribbon-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.raxha-nav-links a:hover {
+  color: #fff;
+}
+
+.raxha-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.raxha-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.raxha-btn-lg {
+  padding: 0.65rem 1.25rem;
+  font-size: 0.9375rem;
+}
+
+.raxha-btn-primary {
+  background: var(--word-accent);
+  color: #fff;
+}
+
+.raxha-btn-primary:hover {
+  background: #1084d8;
+}
+
+.raxha-btn-ghost {
+  color: var(--word-ribbon-muted);
+  background: transparent;
+}
+
+.raxha-btn-ghost:hover {
+  color: #fff;
+  background: var(--word-ribbon-hover);
+}
+
+.raxha-btn-outline {
+  color: #fff;
+  border-color: #555;
+  background: transparent;
+}
+
+.raxha-btn-outline:hover {
+  background: var(--word-ribbon-hover);
+  border-color: #777;
+}
+
+.raxha-hero {
+  padding: 4.5rem 0 3.5rem;
+  background: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(0, 120, 212, 0.18), transparent);
+}
+
+.raxha-hero-inner {
+  text-align: center;
+}
+
+.raxha-hero-badge {
+  display: inline-block;
+  margin-bottom: 1.25rem;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #6cb4ff;
+  background: rgba(0, 120, 212, 0.12);
+  border: 1px solid rgba(0, 120, 212, 0.25);
+  border-radius: 999px;
+}
+
+.raxha-hero-title {
+  font-size: clamp(1.875rem, 5vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.raxha-hero-subtitle {
+  margin: 1.25rem auto 0;
+  max-width: 560px;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--word-ribbon-muted);
+}
+
+.raxha-hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.raxha-demo-hint {
+  margin-top: 1.25rem;
+  font-size: 0.8125rem;
+  color: #888;
+}
+
+.raxha-demo-hint code {
+  padding: 0.1rem 0.35rem;
+  font-size: 0.8125rem;
+  background: #2a2a2a;
+  border-radius: 4px;
+  color: #ccc;
+}
+
+.raxha-section {
+  padding: 4rem 0;
+}
+
+.raxha-section-alt {
+  background: #1f1f1f;
+}
+
+.raxha-section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.raxha-section-subtitle {
+  margin-top: 0.75rem;
+  text-align: center;
+  color: var(--word-ribbon-muted);
+  font-size: 1rem;
+}
+
+.raxha-features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.raxha-feature-card {
+  padding: 1.25rem 1.35rem;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 10px;
+  transition: border-color 0.15s;
+}
+
+.raxha-feature-card:hover {
+  border-color: rgba(0, 120, 212, 0.4);
+}
+
+.raxha-feature-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.raxha-feature-card p {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--word-ribbon-muted);
+}
+
+.raxha-steps {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+}
+
+.raxha-step-card {
+  padding: 1.5rem;
+  background: #222;
+  border: 1px solid #333;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.raxha-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--word-accent);
+  border-radius: 999px;
+}
+
+.raxha-step-card h3 {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.raxha-step-card p {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--word-ribbon-muted);
+}
+
+.raxha-cta-band {
+  padding: 3.5rem 0;
+  background: linear-gradient(135deg, rgba(0, 120, 212, 0.15), rgba(0, 120, 212, 0.05));
+  border-top: 1px solid #2a2a2a;
+  border-bottom: 1px solid #2a2a2a;
+}
+
+.raxha-cta-inner {
+  text-align: center;
+}
+
+.raxha-cta-inner h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.raxha-cta-inner p {
+  margin: 0.5rem 0 1.5rem;
+  color: var(--word-ribbon-muted);
+}
+
+.raxha-footer {
+  padding: 2.5rem 0 2rem;
+  background: #141414;
+  border-top: 1px solid #2a2a2a;
+}
+
+.raxha-footer-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.raxha-footer-tagline {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--word-ribbon-muted);
+  max-width: 280px;
+}
+
+.raxha-footer-built {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.raxha-footer-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #2a2a2a;
+  font-size: 0.8125rem;
+  color: #888;
+}
+
+.raxha-footer-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.raxha-footer-links a {
+  color: var(--word-ribbon-muted);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.raxha-footer-links a:hover {
+  color: #fff;
+}
+
+.raxha-logo-text {
+  color: #fff;
+}
+
+.raxha-social-links {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.raxha-social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #222;
+  color: var(--word-ribbon-muted);
+  text-decoration: none;
+  transition: transform 0.15s, color 0.15s, border-color 0.15s, background 0.15s;
+}
+
+.raxha-social-link:hover {
+  transform: scale(1.08);
+  color: #fff;
+  border-color: var(--word-accent);
+  background: rgba(0, 120, 212, 0.12);
+}
+
+.raxha-social-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.raxha-social-links-light .raxha-social-link {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #64748b;
+}
+
+.raxha-social-links-light .raxha-social-link:hover {
+  color: var(--word-accent);
+  border-color: var(--word-accent);
+  background: rgba(0, 120, 212, 0.08);
+}
+
+@media (min-width: 640px) {
+  .raxha-nav-links {
+    display: flex;
+  }
+
+  .raxha-features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .raxha-steps {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .raxha-footer-bottom {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 900px) {
+  .raxha-features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .raxha-footer-inner {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .raxha-footer-founder {
+    text-align: right;
+  }
+}

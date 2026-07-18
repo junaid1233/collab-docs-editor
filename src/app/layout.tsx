@@ -13,8 +13,21 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ajaia Docs",
-  description: "Lightweight collaborative document editor",
+  title: "Raxha — Collaborative Document Editor",
+  description:
+    "Write together with Word-style formatting, auto-save, and simple email sharing. Built by Muhammad Junaid.",
+  openGraph: {
+    title: "Raxha — Collaborative Document Editor",
+    description:
+      "Write together with Word-style formatting, auto-save, and simple email sharing.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Raxha — Collaborative Document Editor",
+    description:
+      "Write together with Word-style formatting, auto-save, and simple email sharing.",
+  },
 };
 
 export default function RootLayout({

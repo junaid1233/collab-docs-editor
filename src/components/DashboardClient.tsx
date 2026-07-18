@@ -146,7 +146,7 @@ export function DashboardClient({ userName, owned, shared }: DashboardProps) {
       <header className="border-b border-border bg-card">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <div>
-            <h1 className="text-xl font-bold">Ajaia Docs</h1>
+            <h1 className="text-xl font-bold">Raxha</h1>
             <p className="text-sm text-muted">Welcome, {userName}</p>
           </div>
           <button
